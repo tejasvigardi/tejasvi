@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback Form</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff4d4d, #660000);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 20px;
+      width: 450px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+    h2 {
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(to right,#e63946,#9d0208);
+      padding: 15px;
+      border-radius:12px;
+      margin:-30px -40px 20px -40px;
+    }
+    label {
+      display:block;
+      margin:12px 0 6px;
+      color:#333;
+      font-weight:600;
+    }
+    input, select, textarea {
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      margin-bottom:12px;
+      box-sizing:border-box;
+      font-size:14px;
+    }
+    button {
+      width:100%;
+      padding:14px;
+      background: linear-gradient(135deg,#e63946,#9d0208);
+      color:white;
+      border:none;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    button:hover {
+      transform:scale(1.05);
+      box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    }
+    .stars {
+      display:flex;
+      flex-direction:row-reverse;
+      justify-content:flex-end;
+      margin-bottom:20px;
+    }
+    .stars input {
+      display:none;
+    }
+    .stars label {
+      font-size:28px;
+      color:#ccc;
+      cursor:pointer;
+      margin-left:5px;
+    }
+    .stars input:checked ~ label,
+    .stars label:hover,
+    .stars label:hover ~ label {
+      color:#ffeb3b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📝 Feedback Form</h2>
+    <form id="feedbackForm">
+      <label>Name:</label>
+      <input type="text" name="user_name" placeholder="Your Name" required />
+      <label>Role:</label>
+      <select name="role" required>
+        <option value="">-- Select Role --</option>
+        <option value="donor">Donor</option>
+        <option value="receiver">Receiver</option>
+        <option value="hospital">Hospital</option>
+        <option value="blood_bank">Blood Bank</option>
+      </select>
+      <label>Rating:</label>
+      <div class="stars">
+        <input type="radio" id="star5" name="rating" value="5" /><label for="star5">★</label>
+        <input type="radio" id="star4" name="rating" value="4" /><label for="star4">★</label>
+        <input type="radio" id="star3" name="rating" value="3" /><label for="star3">★</label>
+        <input type="radio" id="star2" name="rating" value="2" /><label for="star2">★</label>
+        <input type="radio" id="star1" name="rating" value="1" /><label for="star1">★</label>
+      </div>
+      <label>Comments / Suggestions:</label>
+      <textarea name="comments" rows="5" placeholder="Write your feedback here..." required></textarea>
+      <label>City:</label>
+      <input type="text" name="city" placeholder="City (optional)" />
+      <button type="submit">Submit Feedback</button>
+    </form>
+  </div>
+  <script>
+    const feedbackForm = document.getElementById("feedbackForm");
+    feedbackForm.addEventListener("submit", async function(e) {
+      e.preventDefault(); // Prevent page reload
+      const name = feedbackForm.user_name.value.trim();
+      const role = feedbackForm.role.value;
+      const rating = feedbackForm.rating.value;
+      const comments = feedbackForm.comments.value.trim();
+      const city = feedbackForm.city.value.trim();
+      if (!name || !role || !rating || !comments) {
+        alert("Please fill all required fields.");
+        return;
+      }
+      const data = {
+        user_name: name,
+        role,
+        rating: parseInt(rating), // Convert rating to number
+        comments,
+        city
+      };
+      console.log("Sending feedback data:", data); // Log data being sent
+      try {
+        const response = await fetch("http://localhost:5000/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        console.log("Response Status:", response.status); // Log response status
+        const result = await response.json();
+        console.log("Response Data:", result); // Log response data
+        if (response.ok) {
+          alert("Thank you for your feedback!");
+          feedbackForm.reset();
+        } else {
+          alert(result.message || "Failed to submit feedback");
+        }
+      } catch (err) {
+        console.error("Fetch Error:", err); // Log fetch error
+        alert("An error occurred while submitting feedback");
+      }
+    });
+  </script>
+</body>
+</html>

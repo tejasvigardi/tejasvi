@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      margin: 0;
+      background: url('https://wallpaperaccess.com/full/5793602.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: linear-gradient(to bottom right, rgba(211, 36, 74, 0.9), rgba(255, 26, 26, 0.9));
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      width: 400px;
+      color: white;
+      text-align: center;
+    }
+
+    h2 { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      text-align: left;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #800000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover { background: #ff0000; }
+
+    .forgot-email {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .forgot-email a {
+      color: yellow;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label>Email:</label>
+      <input type="email" name="email" required />
+
+      <label>Password:</label>
+      <input type="password" name="password" required />
+
+      <label>Role:</label>
+      <select name="role" required>
+        <option value="donor">Donor</option>
+        <option value="receiver">Receiver</option>
+        <option value="admin">Admin</option>
+        <option value="hospital">Hospital</option>
+        <option value="blood_bank">Blood Bank</option>
+      </select>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="forgot-email">
+      <a id="forgotEmail">Forgot Email?</a>
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById("loginForm");
+    const forgotEmailLink = document.getElementById("forgotEmail");
+
+    loginForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = loginForm.email.value.trim();
+      const password = loginForm.password.value;
+      const role = loginForm.role.value;
+
+      try {
+        const response = await fetch("http://localhost:5000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, role })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Persist minimal user info so dashboard pages can read it
+            try {
+              const userObj = { _id: result.userId, role: result.role, email };
+              localStorage.setItem('user', JSON.stringify(userObj));
+            } catch (e) { console.warn('Could not save user to localStorage', e); }
+            alert(`✅ Login successful! Welcome ${result.role}`);
+            window.location.href = result.redirect; // redirect from server response
+          } else {
+            alert(result.message || "Login failed");
+          const confirmRedirect = confirm("Account not found. Do you want to register?");
+          if (confirmRedirect) window.location.href = "index.html";
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert("An error occurred during login");
+      }
+    });
+
+    forgotEmailLink.addEventListener("click", function () {
+      alert("Please contact admin or check your registration email to recover your account.");
+    });
+  </script>
+</body>
+</html>

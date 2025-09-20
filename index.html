@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeSaver - Blood Donation Management</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    
+/* Google Font */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+  background: #e63946;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+    nav {
+      background: #e63946;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav .logo {
+      color: #fff;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li {
+      position: relative;
+    }
+
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 15px;
+      display: block;
+    }
+
+    nav ul li:hover {
+      background: #d62828;
+      border-radius: 4px;
+    }
+
+    /* Dropdown - hidden by default */
+    nav ul li ul {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      min-width: 150px;
+      display: none;
+      box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+      border-radius: 6px;
+      z-index: 1000;
+    }
+
+    nav ul li ul li a {
+      color: #333;
+      padding: 10px 15px;
+    }
+
+    nav ul li ul li a:hover {
+      background: #f1f1f1;
+      border-radius: 0;
+    }
+
+    
+    nav ul li:hover ul {
+      display: block;
+    }
+/* Dropdown Container */
+.dropdown {
+  position: relative;
+}
+
+/* Dropdown Container */
+.dropdown {
+  position: relative;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff; /* white background for better visibility */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  min-width: 160px;
+  z-index: 100;
+}
+
+/* Dropdown items */
+.dropdown-menu li {
+  margin: 0;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+}
+
+.dropdown-menu a:hover {
+  background: #f2f2f2;
+  color: #e63946;
+}
+
+/* Show on hover */
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+
+
+/* Hero Section */
+.hero {
+  height: 90vh;
+  background: url('https://wallpapercave.com/wp/wp4323467.jpg') no-repeat center center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-align: center;
+  color: #fff;
+}
+
+.hero .overlay {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 40px;
+  border-radius: 12px;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+}
+
+.btn {
+  display: inline-block;
+  background: #fff;
+  color: #e63946;
+  padding: 12px 25px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #e63946;
+  color: #fff;
+}
+
+/* About Section */
+.about {
+  padding: 60px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.about h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #e63946;
+}
+
+.about p {
+  max-width: 700px;
+  margin: auto;
+  margin-bottom: 40px;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  flex: 1;
+  min-width: 250px;
+  max-width: 350px;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.card h3 {
+  margin-bottom: 15px;
+  color: #e63946;
+}
+
+/* Footer */
+footer {
+  background: #222;
+  color: #fff;
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 50px;
+}
+
+
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <h1 class="logo">LifeSaver</h1>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About Us</a></li>
+
+       
+     <li class="dropdown">
+  <a href="#">Register ▼</a>
+  <ul class="dropdown-menu">
+    <li><a href="register-donor.html">Donor</a></li>
+    <li><a href="register-receiver.html">Receiver</a></li>
+    <li><a href="register-hospital.html">Hospital</a></li>
+    <li><a href="register-bloodbank.html">Blood Bank</a></li>
+  </ul>
+</li>
+
+
+
+        <li><a href="login.html">Login</a></li>
+        <li><a href="feedback.html">Feedback</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="overlay">
+      <h2>Donate Blood, Save Lives</h2>
+      <p>Connecting donors with receivers, hospitals, and blood banks.</p>
+      <a href="register-donor.html" class="btn">Become a Donor</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about">
+    <h2>About Us</h2>
+    <p>LifeSaver is an online platform that connects voluntary donors with those in need, ensuring no life is lost due to blood shortage.</p>
+    <div class="cards">
+      <div class="card">
+        <h3>Our Mission</h3>
+        <p>Save lives by connecting donors with those in urgent need.</p>
+      </div>
+      <div class="card">
+        <h3>Our Vision</h3>
+        <p>Create a reliable blood donation network across the nation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 LifeSaver | All Rights Reserved</p>
+  </footer>
+
+
+
+  <script>
+    // Base URL for API
+const API_BASE = 'http://localhost:5000/api';
+
+// Register form handler
+document.getElementById('registerForm')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+
+  try {
+    const response = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert('Registration successful!');
+      window.location.href = 'login.html';
+    } else {
+      alert(result.message || 'Registration failed');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred during registration');
+  }
+});
+
+// Login form handler
+document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+
+  try {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem('token', result.token);
+      localStorage.setItem('user', JSON.stringify(result.user));
+
+      // Redirect based on role
+      switch (result.user.role) {
+        case 'donor':
+          window.location.href = 'dashboard-donor.html';
+          break;
+        case 'receiver':
+          window.location.href = 'dashboard-receiver.html';
+          break;
+        case 'hospital':
+          window.location.href = 'dashboard-hospital.html';
+          break;
+        case 'bloodbank':
+          window.location.href = 'dashboard-bloodbank.html';
+          break;
+        case 'admin':
+          window.location.href = 'dashboard-admin.html';
+          break;
+        default:
+          window.location.href = 'index.html';
+      }
+    } else {
+      alert(result.message || 'Login failed');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred during login');
+  }
+});
+
+// Logout function
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = 'index.html';
+}
+
+
+  </script>
+</body>
+</html>

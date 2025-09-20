@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Account</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#ff4d4d, #660000);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      margin: 30px 0;
+      background: white;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      color: #555;
+    }
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #080202;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #cb2411;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Create Account As Receiver</h2>
+    <form id="registerForm">
+      <label>Role:</label>
+      <select name="role" id="role" required>
+        <option value="receiver">Receiver</option>
+      </select>
+      <label>Name:</label>
+      <input type="text" name="name" required />
+      <label>Email:</label>
+      <input type="email" name="email" required />
+      <label>Phone:</label>
+      <input type="text" name="phone" id="phone" required />
+      <label>Aadhaar:</label>
+      <input type="text" name="aadhaar" id="aadhaar" required />
+      <label>City:</label>
+      <input type="text" name="city" required />
+      <label>Password:</label>
+      <input type="password" name="password" id="password" required />
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("registerForm");
+    const phoneInput = document.getElementById("phone");
+    const aadhaarInput = document.getElementById("aadhaar");
+    const passwordInput = document.getElementById("password");
+
+    // Phone validation
+    phoneInput.addEventListener("blur", function () {
+      if (this.value.length !== 10 || !/^\d+$/.test(this.value)) {
+        alert("Phone number must be 10 digits.");
+        this.focus();
+      }
+    });
+
+    // Aadhaar validation
+    aadhaarInput.addEventListener("blur", function () {
+      if (this.value.length !== 12 || !/^\d+$/.test(this.value)) {
+        alert("Aadhaar number must be 12 digits.");
+        this.focus();
+      }
+    });
+
+    // Password validation
+    function validatePassword(pwd) {
+      const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+      return pattern.test(pwd);
+    }
+
+    // Form submit
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      // Validate password
+      if (!validatePassword(passwordInput.value)) {
+        alert("Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
+        passwordInput.focus();
+        return;
+      }
+
+      // Collect form data
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      console.log("Sending data:", data); // Debug log
+
+      try {
+        const response = await fetch("http://localhost:5000/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        console.log("Server response:", result); // Debug log
+
+        if (response.ok) {
+          alert("✅ Registration successful!");
+          form.reset();
+          window.location.href = "login.html";
+        } else {
+          alert(result.message || "❌ Registration failed");
+        }
+      } catch (error) {
+        console.error("Fetch error:", error); // Debug log
+        alert("❌ An error occurred during registration: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>

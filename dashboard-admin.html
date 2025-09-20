@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #ff4d4d, #b30000);
+      color: #333;
+    }
+
+     header {
+      background: #800000;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    main {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+    }
+
+    section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h3 {
+      margin-bottom: 15px;
+      color: #800000;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    /* Better fixed layout and overflow handling for admin tables */
+    table.fixed { table-layout: fixed; }
+    table.fixed th, table.fixed td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    table.fixed th:nth-child(1), table.fixed td:nth-child(1) { width: 22%; text-align: left; }
+    table.fixed th:nth-child(2), table.fixed td:nth-child(2) { width: 28%; text-align: left; }
+    table.fixed th:nth-child(3), table.fixed td:nth-child(3) { width: 18%; }
+    table.fixed th:nth-child(4), table.fixed td:nth-child(4) { width: 12%; }
+    table.fixed th:nth-child(5), table.fixed td:nth-child(5) { width: 20%; }
+
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    table th {
+      background: #f2f2f2;
+    }
+
+    button {
+      background: #800000;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #b30000;
+    }
+
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      resize: none;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul li {
+      background: #f9f9f9;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <h2 style="margin:0;">Welcome Admin</h2>
+      <div>
+        <button onclick="logout()" style="padding:8px 12px; border-radius:8px; border:none; background:#fff; color:#800; cursor:pointer;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Manage Users -->
+    <section>
+      <h3>Manage Users</h3>
+      <div class="table-wrap"><table id="usersTable" class="fixed">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>City</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5" class="placeholder">Loading users...</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- Manage Requests -->
+    <section>
+      <h3>Manage Requests</h3>
+      <div class="table-wrap"><table id="requestsTable" class="fixed">
+        <thead>
+          <tr><th>Recipient</th><th>Blood Group</th><th>Receiver</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5" class="placeholder">Loading requests...</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- Manage Feedback -->
+    <section>
+      <h3>Manage Feedback</h3>
+      <div class="table-wrap"><table id="feedbackTable" class="fixed">
+        <thead><tr><th>User</th><th>Role</th><th>Rating</th><th>Comments</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td colspan="5" class="placeholder">Loading feedback...</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- Send Email -->
+    <section>
+      <h3>Send System-Wide Email</h3>
+      <form>
+        <input type="text" placeholder="Subject" required />
+        <textarea rows="4" placeholder="Message to all users..." required></textarea>
+        <button type="submit">Send Email</button>
+      </form>
+    </section>
+
+    <!-- Export Reports -->
+    <section>
+      <h3>Export Reports</h3>
+      <button id="downloadUsers">Download User Report</button>
+      <button id="downloadRequests">Download Request Report</button>
+    </section>
+  </main>
+  <script>
+  function logout(){ try{ localStorage.removeItem('user'); }catch(e){}; window.location.href='login.html'; }
+
+  function getCurrentUser(){ try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; } }
+
+  async function fetchUsers(){
+    const tbody = document.querySelector('#usersTable tbody');
+    const user = getCurrentUser();
+    if(!user) return window.location.href='login.html';
+    try{
+      const res = await fetch('http://localhost:5000/api/users', { headers: { 'x-user-id': user._id } });
+      const users = await res.json();
+      tbody.innerHTML = '';
+      users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = u._id;
+        tr.innerHTML = `<td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.city}</td><td><button onclick="deleteUser('${u._id}')">Delete</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }catch(err){ console.error(err); tbody.innerHTML = '<tr><td colspan="5" class="placeholder">Failed to load users</td></tr>'; }
+  }
+
+  async function fetchRequests(){
+    const tbody = document.querySelector('#requestsTable tbody');
+    const user = getCurrentUser(); if(!user) return window.location.href='login.html';
+    try{
+      const res = await fetch('http://localhost:5000/api/all-requests', { headers: { 'x-user-id': user._id } });
+      const requests = await res.json();
+      tbody.innerHTML = '';
+      requests.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = r.id;
+        tr.innerHTML = `<td>${r.recipient}</td><td>${r.blood_group}</td><td>${r.receiver_name || r.receiver || 'Unknown'}</td><td>${r.status}</td><td><button onclick="deleteRequest('${r.id}')">Delete</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }catch(err){ console.error(err); tbody.innerHTML = '<tr><td colspan="5" class="placeholder">Failed to load requests</td></tr>'; }
+  }
+
+  async function fetchFeedback(){
+    const tbody = document.querySelector('#feedbackTable tbody');
+    const user = getCurrentUser(); if(!user) return window.location.href='login.html';
+    try{
+      const res = await fetch('http://localhost:5000/api/feedback', { headers: { 'x-user-id': user._id } });
+      const items = await res.json();
+      tbody.innerHTML = '';
+      items.forEach(f => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = f._id;
+        tr.innerHTML = `<td>${f.user_name}</td><td>${f.role}</td><td>${f.rating}</td><td>${f.comments}</td><td><button onclick="deleteFeedback('${f._id}')">Delete</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }catch(err){ console.error(err); tbody.innerHTML = '<tr><td colspan="5" class="placeholder">Failed to load feedback</td></tr>'; }
+  }
+
+  async function deleteUser(id){
+    const user = getCurrentUser(); if(!user) return window.location.href='login.html';
+    if(!confirm('Delete this user and related data?')) return;
+    try{
+      console.debug('Deleting user', id, 'with header x-user-id=', user._id);
+      const res = await fetch(`http://localhost:5000/api/users/${id}`, { method: 'DELETE', headers: { 'x-user-id': user._id } });
+      const j = await res.json();
+      console.debug('Delete user response', res.status, j);
+      if(res.ok){
+        alert(j.message || 'Deleted');
+        const row = document.querySelector(`#usersTable tbody tr[data-id="${id}"]`);
+        if(row) row.remove();
+        // also remove any related request rows
+        const reqRow = document.querySelector(`#requestsTable tbody tr[data-id="${id}"]`);
+        if(reqRow) reqRow.remove();
+      } else { alert(j.error || 'Delete failed'); }
+    }catch(e){ console.error(e); alert('Delete failed'); }
+  }
+
+  async function deleteRequest(id){
+    const user = getCurrentUser(); if(!user) return window.location.href='login.html';
+    if(!confirm('Delete this request?')) return;
+    try{
+      console.debug('Deleting request', id, 'with header x-user-id=', user._id);
+      const res = await fetch(`http://localhost:5000/api/blood-requests/${id}`, { method: 'DELETE', headers: { 'x-user-id': user._id } });
+      const j = await res.json();
+      console.debug('Delete request response', res.status, j);
+      if(res.ok){
+        alert(j.message || 'Deleted');
+        const row = document.querySelector(`#requestsTable tbody tr[data-id="${id}"]`);
+        if(row) row.remove();
+      } else { alert(j.error || 'Delete failed'); }
+    }catch(e){ console.error(e); alert('Delete failed'); }
+  }
+
+  async function deleteFeedback(id){
+    const user = getCurrentUser(); if(!user) return window.location.href='login.html';
+    if(!confirm('Delete this feedback?')) return;
+    try{
+      console.debug('Deleting feedback', id, 'with header x-user-id=', user._id);
+      const res = await fetch(`http://localhost:5000/api/feedback/${id}`, { method: 'DELETE', headers: { 'x-user-id': user._id } });
+      const j = await res.json();
+      console.debug('Delete feedback response', res.status, j);
+      if(res.ok){
+        alert(j.message || 'Deleted');
+        const row = document.querySelector(`#feedbackTable tbody tr[data-id="${id}"]`);
+        if(row) row.remove();
+      } else { alert(j.error || 'Delete failed'); }
+    }catch(e){ console.error(e); alert('Delete failed'); }
+  }
+
+  document.getElementById('downloadUsers').addEventListener('click', () => {
+    window.location.href = 'http://localhost:5000/api/export/users';
+  });
+
+  document.getElementById('downloadRequests').addEventListener('click', () => {
+    window.location.href = 'http://localhost:5000/api/export/requests';
+  });
+
+  // Initialize lists
+  fetchUsers();
+  fetchRequests();
+  fetchFeedback();
+  </script>
+</body>
+</html>

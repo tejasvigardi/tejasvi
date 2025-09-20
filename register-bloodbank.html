@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blood Bank Registration</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff4d4d, #660000);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      width: 420px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h2 {
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(to right, #e63946, #9d0208);
+      padding: 15px;
+      border-radius: 12px;
+      margin: -30px -40px 20px -40px;
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #e63946;
+      box-shadow: 0 0 6px rgba(230, 57, 70, 0.6);
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #e63946, #9d0208);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🩸 Blood Bank Registration</h2>
+    <form id="bloodBankForm">
+      <input type="hidden" name="role" value="blood_bank">
+
+      <label>Blood Bank Name:</label>
+      <input type="text" name="name" required />
+
+      <label>Address:</label>
+      <input type="text" name="address" required />
+
+      <label>City:</label>
+      <input type="text" name="city" required />
+
+      <label>Phone Number:</label>
+      <input type="text" name="phone" id="phone" required />
+
+      <label>Email:</label>
+      <input type="email" name="email" id="email" required />
+
+      <label>Password:</label>
+      <input type="password" name="password" id="password" required />
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("bloodBankForm");
+    const phoneInput = document.getElementById("phone");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+
+    function validatePassword(pwd) {
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/.test(pwd);
+    }
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      // Phone validation
+      if (phoneInput.value.length !== 10 || !/^\d+$/.test(phoneInput.value)) {
+        alert("Phone number must be 10 digits.");
+        phoneInput.focus();
+        return;
+      }
+
+      // Email validation
+      if (!validateEmail(emailInput.value)) {
+        alert("Please enter a valid email address.");
+        emailInput.focus();
+        return;
+      }
+
+      // Password validation
+      if (!validatePassword(passwordInput.value)) {
+        alert("Password must be at least 8 characters long and include uppercase, lowercase, number & special character.");
+        passwordInput.focus();
+        return;
+      }
+
+      // Prepare form data
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      try {
+        const response = await fetch("http://localhost:5000/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert(result.message || "Blood Bank registered successfully!");
+          form.reset();
+          window.location.href = "login.html"; // optional redirect
+        } else {
+          alert(result.message || "Registration failed");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred during registration");
+      }
+    });
+  </script>
+</body>
+</html>
